@@ -1,34 +1,40 @@
 const express = require("express");
-
 const app = express();
+const port = 3200;
 
 const newConnection = require("./DBConnection");
+//const cors = require("cors");
 
-app.get("/users", (req, res) => {
-	let conn = newConnection();
-	conn.connect();
+//app.use(cors());
+app.use(express.json());
 
-	let response = "";
-
-	conn.query("SELECT username FROM users", 
-	(error, res) => {
-		if (error) {
-			console.log(error)
-		}
-		else {
-			res.send(JSON.stringify(results));
-		}
-	}	
+app.get("/", (req, res) => {
+	res.send("Hello World!");
 });
 
-app.post("/insert-new-user", (req, res) => {
+app.get("/get-users", (req, res) => {
 	let conn = newConnection();
 	conn.connect();
 
-	const username = req.body.username;
-	const userPassword = req.body.userPassword;
-	const gender = req.body.gender;
-	const age = req.body.age;
+	conn.query("SELECT username FROM users", (error, result) => {
+		if (error) {
+			console.log(error);
+		} else {
+			res.send(result);
+		}
+	});
+});
+
+app.post("/add-user", (req, res) => {
+	console.log("got request");
+	console.log(req);
+	let conn = newConnection();
+	conn.connect();
+
+	let username = req.body.username;
+	let userPassword = req.body.userPassword;
+	let gender = req.body.gender;
+	let age = req.body.age;
 
 	conn.query(
 		"INSERT INTO users (username, userPassword, gender, age) VALUES (?,?,?,?)",
@@ -37,12 +43,12 @@ app.post("/insert-new-user", (req, res) => {
 			if (error) {
 				console.log(error);
 			} else {
-				res.send("New user added");
+				res.send("New user inserted");
 			}
 		}
 	);
 });
 
-app.listen(3001, () => {
-	console.log("Your server is running on port 3001");
+app.listen(port, () => {
+	console.log(`Example app listening at http://localhost:${port}`);
 });
