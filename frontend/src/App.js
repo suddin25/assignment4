@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Axios from "axios";
 
 function App() {
@@ -8,15 +8,6 @@ function App() {
 	const [gender, setGender] = useState("");
 	const [age, setAge] = useState("");
 
-	//const [usersList, setUsersList] = useState([]);
-
-	/* 	useEffect(() => {
-		fetch("/");
-		return () => {
-			cleanup;
-		};
-	}, []); */
-
 	const addUser = () => {
 		Axios.post("http://localhost:3200/add-user", {
 			username: username,
@@ -24,19 +15,88 @@ function App() {
 			gender: gender,
 			age: age,
 		}).then(() => {
-			console.log("success");
+			alert("User Added");
 		});
 	};
 
-	const getUsers = () => {
-		Axios.get("http://localhost:3200/get-users").then((response) => {
+	// F1
+	let topAlbumsList = "";
+
+	const getTopFiveArtists = () => {
+		Axios.get("http://localhost:3200/top-5-albums").then((response) => {
+			response.data.forEach((element) => {
+				topAlbumsList = topAlbumsList + element.artistUsername + "\n";
+			});
 			console.log(response);
+			alert(topAlbumsList);
+		});
+	};
+
+	const [usernameNewPass, setUsernameNewPass] = useState("");
+	const [newPass, setNewPass] = useState("");
+
+	// F2
+	const updatePassword = () => {
+		Axios.post("http://localhost:3200/update-password", {
+			username: usernameNewPass,
+			userPassword: newPass,
+		}).then(() => {
+			alert(`Password updated for ${usernameNewPass}`);
+		});
+	};
+
+	const [albumName, setAlbumName] = useState("");
+
+	// F3
+	let albumSongsList = "";
+
+	const getAlbumSongs = () => {
+		Axios.get("http://localhost:3200/get-album-songs", {
+			params: {
+				albumName: albumName,
+			},
+		}).then((response) => {
+			response.data.forEach((element) => {
+				albumSongsList = albumSongsList + element.songName + "\n";
+			});
+			console.log(response);
+			alert(albumSongsList);
+		});
+	};
+
+	// F4
+	const [usernameGetSongs, setUsernameGetSongs] = useState("");
+	let songList = "";
+
+	const getUserSongs = () => {
+		Axios.get("http://localhost:3200/user-get-songs", {
+			params: {
+				username: usernameGetSongs,
+			},
+		}).then((response) => {
+			response.data.forEach((element) => {
+				songList = songList + element.songName + "\n";
+			});
+			console.log(response);
+			alert(songList);
+		});
+	};
+
+	// F5
+	const [usernameDeletePlaylist, setUsernameRemovePlaylist] = useState("");
+
+	const deleteAllUserSongs = () => {
+		Axios.post("http://localhost:3200/delete-user-songs", {
+			username: usernameDeletePlaylist,
+		}).then(() => {
+			alert("All Songs Removed");
 		});
 	};
 
 	return (
 		<div className="App">
-			<div className="createUser">
+			<div className="continer">
+				<h3>Create User</h3>
 				<label>Username:</label>
 				<input
 					type="text"
@@ -65,20 +125,72 @@ function App() {
 						setAge(event.target.value);
 					}}
 				/>
-				<button onClick={addUser}>Add Employee</button>
+				<button onClick={addUser}>Add User</button>
 			</div>
-			{/* <div className="employees"></div>
-			<div className="Login">
-				<button
-					className="Users"
-					onClick={() => {
-						fetch("/users");
+
+			<div className="continer">
+				<h3>Update Password</h3>
+				<label>Enter Username:</label>
+				<input
+					type="text"
+					onChange={(event) => {
+						setUsernameNewPass(event.target.value);
 					}}
-				>
-					Users
-				</button>
+				/>
+				<label>Enter New Password:</label>
+				<input
+					type="text"
+					onChange={(event) => {
+						setNewPass(event.target.value);
+					}}
+				/>
+				<button onClick={updatePassword}>Update Password</button>
 			</div>
-			<label htmlFor=""></label> */}
+
+			<div className="continer">
+				<h3>Get list of User Songs</h3>
+				<label>Enter Username:</label>
+				<input
+					type="text"
+					onChange={(event) => {
+						setUsernameGetSongs(event.target.value);
+					}}
+				/>
+				<button onClick={getUserSongs}>Get User Songs</button>
+				<div className="songs"></div>
+			</div>
+
+			<div className="continer">
+				<h3>Remove All Of User's Songs</h3>
+				<label>Enter Username:</label>
+				<input
+					type="text"
+					onChange={(event) => {
+						setUsernameRemovePlaylist(event.target.value);
+					}}
+				/>
+				<button onClick={deleteAllUserSongs}>Remove Playlist</button>
+			</div>
+
+			<div className="continer">
+				<h3>Get Top 5 Artists</h3>
+				<button onClick={getTopFiveArtists}>
+					Get Top Five Artists
+				</button>
+				<div>{topAlbumsList}</div>
+			</div>
+
+			<div className="continer">
+				<h3>Get Songs In A Album</h3>
+				<label>Enter Album Name:</label>
+				<input
+					type="text"
+					onChange={(event) => {
+						setAlbumName(event.target.value);
+					}}
+				/>
+				<button onClick={getAlbumSongs}>Get Songs From Album</button>
+			</div>
 		</div>
 	);
 }
